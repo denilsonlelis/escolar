@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Entrada e Saída de Alunos</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { text-align: center; }
+        .aluno { padding: 10px; margin: 5px; background: #f0f0f0; cursor: pointer; text-align: center; border-radius: 5px; }
+        .aluno.entrada { background: #d4edda; }
+        .aluno.saida { background: #f8d7da; }
+        .status { text-align: center; margin: 20px 0; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Controle de Entrada e Saída de Alunos</h1>
+    <div id="status" class="status"></div>
+    <div id="alunos"></div>
+
+    <script>
+        const alunos = [
+            "Aluno 1", "Aluno 2", "Aluno 3", "Aluno 4", "Aluno 5",
+            "Aluno 6", "Aluno 7", "Aluno 8", "Aluno 9", "Aluno 10",
+            "Aluno 11", "Aluno 12", "Aluno 13", "Aluno 14", "Aluno 15",
+            "Aluno 16", "Aluno 17", "Aluno 18", "Aluno 19", "Aluno 20"
+        ];
+
+        const registros = {};
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxRLoTeaszjB0skx4lOvlVtdaFkA2Y1Ge7AcprzLS7_a4M34w4m9Z7IDpcBEk-LwouR0w/exec';
+
+        function init() {
+            const alunosDiv = document.getElementById('alunos');
+            alunos.forEach(aluno => {
+                const div = document.createElement('div');
+                div.className = 'aluno';
+                div.textContent = aluno;
+                div.onclick = () => registrarAcao(aluno);
+                alunosDiv.appendChild(div);
+            });
+            carregarRegistros();
+        }
+
+        function carregarRegistros() {
+            const hoje = new Date().toLocaleDateString('pt-BR');
+            const saved = localStorage.getItem('registros');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                if (parsed.data === hoje) {
+                    Object.assign(registros, parsed.alunos);
+                    atualizarInterface();
+                }
+            }
+        }
+
+        function atualizarInterface() {
+            document.querySelectorAll('.aluno').forEach(div => {
+                const aluno = div.textContent;
+                div.className = 'aluno';
+                if (registros[aluno] === 'entrada') {
+                    div.classList.add('entrada');
+                } else if (registros[aluno] === 'saida') {
+                    div.classList.add('saida');
+                }
+            });
+        }
+
+        function registrarAcao(aluno) {
+            const hoje = new Date().toLocaleDateString('pt-BR');
+            const agora = new Date().toLocaleTimeString('pt-BR');
+            const acao = registros[aluno] === 'entrada' ? 'Saída' : 'Entrada';
+            registros[aluno] = acao.toLowerCase();
+
+            fetch(WEB_APP_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    aluno,
+                    acao,
+                    data: hoje,
+                    hora: agora
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    document.getElementById('status').textContent = `${acao} registrada para ${aluno}!`;
+                    localStorage.setItem('registros', JSON.stringify({ data: hoje, alunos: registros }));
+                    atualizarInterface();
+                    setTimeout(() => document.getElementById('status').textContent = '', 3000);
+                } else {
+                    throw new Error(data.message || 'Erro desconhecido');
+                }
+            })
+            .catch(error => {
+                document.getElementById('status').textContent = `Erro ao registrar: ${error.message}`;
+                console.error(error);
+            });
+        }
+
+        init();
+    </script>
+</body>
+</html>
