@@ -1,104 +1,182 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Controle de Entrada e Saída de Alunos</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        h1 { text-align: center; }
-        .aluno { padding: 10px; margin: 5px; background: #f0f0f0; cursor: pointer; text-align: center; border-radius: 5px; }
-        .aluno.entrada { background: #d4edda; }
-        .aluno.saida { background: #f8d7da; }
-        .status { text-align: center; margin: 20px 0; font-weight: bold; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Controle de Condução Escolar</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    h1 {
+      text-align: center;
+    }
+    .form-container {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .aluno {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 8px;
+      background-color: #eee;
+    }
+    .presente {
+      background-color: #d4edda;
+    }
+    .ausente {
+      background-color: #f8d7da;
+    }
+    button {
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .btn-verde {
+      background-color: #28a745;
+      color: white;
+    }
+    .btn-vermelho {
+      background-color: #dc3545;
+      color: white;
+    }
+    .btn-secundario {
+      background-color: #007bff;
+      color: white;
+      margin: 5px;
+    }
+    .info {
+      font-size: 12px;
+    }
+  </style>
 </head>
 <body>
-    <h1>Controle de Entrada e Saída de Alunos</h1>
-    <div id="status" class="status"></div>
-    <div id="alunos"></div>
+  <h1>Controle da Condução Escolar</h1>
 
-    <script>
-        const alunos = [
-            "Aluno 1", "Aluno 2", "Aluno 3", "Aluno 4", "Aluno 5",
-            "Aluno 6", "Aluno 7", "Aluno 8", "Aluno 9", "Aluno 10",
-            "Aluno 11", "Aluno 12", "Aluno 13", "Aluno 14", "Aluno 15",
-            "Aluno 16", "Aluno 17", "Aluno 18", "Aluno 19", "Aluno 20"
+  <div class="form-container">
+    <input type="text" id="nome-aluno" placeholder="Nome do aluno" />
+    <button class="btn-secundario" onclick="adicionarAluno()">Adicionar</button>
+  </div>
+
+  <div style="text-align: center; margin-bottom: 20px;">
+    <button class="btn-secundario" onclick="marcarTodos(true)">Marcar Todos</button>
+    <button class="btn-secundario" onclick="marcarTodos(false)">Desmarcar Todos</button>
+  </div>
+
+  <div id="lista-alunos"></div>
+
+  <script>
+    let alunos = [];
+
+    function salvarEstado() {
+      localStorage.setItem("alunosConducao", JSON.stringify(alunos));
+    }
+
+    function carregarEstado() {
+      const dados = localStorage.getItem("alunosConducao");
+      if (dados) {
+        alunos = JSON.parse(dados);
+      } else {
+        alunos = [
+          { nome: "Luna", presente: false, entrada: null, saida: null },
+          { nome: "Artur", presente: false, entrada: null, saida: null },
+          { nome: "Nátaly", presente: false, entrada: null, saida: null },
+          { nome: "Guilherme", presente: false, entrada: null, saida: null },
+          { nome: "Larissa", presente: false, entrada: null, saida: null },
+          { nome: "Gabriel", presente: false, entrada: null, saida: null },
+          { nome: "Iana", presente: false, entrada: null, saida: null },
+          { nome: "Sophia", presente: false, entrada: null, saida: null },
+          { nome: "Sophia Almeida", presente: false, entrada: null, saida: null },
+          { nome: "Mariana", presente: false, entrada: null, saida: null },
+          { nome: "Mariah", presente: false, entrada: null, saida: null },
+          { nome: "Helton", presente: false, entrada: null, saida: null },
+          { nome: "Beatriz", presente: false, entrada: null, saida: null },
+          { nome: "Giovanna", presente: false, entrada: null, saida: null },
+          { nome: "Brunno", presente: false, entrada: null, saida: null },
+          { nome: "Bianca", presente: false, entrada: null, saida: null },
+          { nome: "Manuela", presente: false, entrada: null, saida: null },
+          { nome: "Clara Costa", presente: false, entrada: null, saida: null },
+          { nome: "Luíza", presente: false, entrada: null, saida: null },
+          { nome: "Laura", presente: false, entrada: null, saida: null }
         ];
+      }
+    }
 
-        const registros = {};
-        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxRLoTeaszjB0skx4lOvlVtdaFkA2Y1Ge7AcprzLS7_a4M34w4m9Z7IDpcBEk-LwouR0w/exec';
+    function adicionarAluno() {
+      const nomeInput = document.getElementById("nome-aluno");
+      const nome = nomeInput.value.trim();
+      if (nome !== "") {
+        alunos.push({ nome, presente: false, entrada: null, saida: null });
+        nomeInput.value = "";
+        salvarEstado();
+        render();
+      }
+    }
 
-        function init() {
-            const alunosDiv = document.getElementById('alunos');
-            alunos.forEach(aluno => {
-                const div = document.createElement('div');
-                div.className = 'aluno';
-                div.textContent = aluno;
-                div.onclick = () => registrarAcao(aluno);
-                alunosDiv.appendChild(div);
-            });
-            carregarRegistros();
-        }
+    function marcarTodos(presente) {
+      const agora = new Date().toLocaleString();
+      alunos.forEach((aluno) => {
+        aluno.presente = presente;
+        aluno.entrada = presente ? agora : null;
+        aluno.saida = presente ? null : agora;
+      });
+      salvarEstado();
+      render();
+    }
 
-        function carregarRegistros() {
-            const hoje = new Date().toLocaleDateString('pt-BR');
-            const saved = localStorage.getItem('registros');
-            if (saved) {
-                const parsed = JSON.parse(saved);
-                if (parsed.data === hoje) {
-                    Object.assign(registros, parsed.alunos);
-                    atualizarInterface();
-                }
-            }
-        }
+    function render() {
+      const container = document.getElementById("lista-alunos");
+      container.innerHTML = "";
 
-        function atualizarInterface() {
-            document.querySelectorAll('.aluno').forEach(div => {
-                const aluno = div.textContent;
-                div.className = 'aluno';
-                if (registros[aluno] === 'entrada') {
-                    div.classList.add('entrada');
-                } else if (registros[aluno] === 'saida') {
-                    div.classList.add('saida');
-                }
-            });
-        }
+      alunos.forEach((aluno, index) => {
+        const div = document.createElement("div");
+        div.className = "aluno " + (aluno.presente ? "presente" : "ausente");
 
-        function registrarAcao(aluno) {
-            const hoje = new Date().toLocaleDateString('pt-BR');
-            const agora = new Date().toLocaleTimeString('pt-BR');
-            const acao = registros[aluno] === 'entrada' ? 'Saída' : 'Entrada';
-            registros[aluno] = acao.toLowerCase();
+        const nome = document.createElement("span");
+        nome.innerText = aluno.nome;
 
-            fetch(WEB_APP_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    aluno,
-                    acao,
-                    data: hoje,
-                    hora: agora
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    document.getElementById('status').textContent = `${acao} registrada para ${aluno}!`;
-                    localStorage.setItem('registros', JSON.stringify({ data: hoje, alunos: registros }));
-                    atualizarInterface();
-                    setTimeout(() => document.getElementById('status').textContent = '', 3000);
-                } else {
-                    throw new Error(data.message || 'Erro desconhecido');
-                }
-            })
-            .catch(error => {
-                document.getElementById('status').textContent = `Erro ao registrar: ${error.message}`;
-                console.error(error);
-            });
-        }
+        const info = document.createElement("div");
+        info.className = "info";
+        info.innerHTML = `
+          Entrada: ${aluno.entrada || "--"}<br>
+          Saída: ${aluno.saida || "--"}
+        `;
 
-        init();
-    </script>
+        const botao = document.createElement("button");
+        botao.className = aluno.presente ? "btn-vermelho" : "btn-verde";
+        botao.innerText = aluno.presente ? "Sair" : "Entrar";
+
+        botao.onclick = () => {
+          aluno.presente = !aluno.presente;
+          const agora = new Date().toLocaleString();
+          if (aluno.presente) {
+            aluno.entrada = agora;
+            aluno.saida = null;
+          } else {
+            aluno.saida = agora;
+          }
+          salvarEstado();
+          render();
+        };
+
+        div.appendChild(nome);
+        div.appendChild(info);
+        div.appendChild(botao);
+
+        container.appendChild(div);
+      });
+    }
+
+    carregarEstado();
+    render();
+  </script>
 </body>
 </html>
