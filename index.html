@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Controle de Condução Escolar</title>
   <style>
     body {
@@ -12,12 +12,6 @@
     }
     h1 {
       text-align: center;
-    }
-    .form-container {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin-bottom: 20px;
     }
     .aluno {
       display: flex;
@@ -34,11 +28,16 @@
     .ausente {
       background-color: #f8d7da;
     }
+    .nao-presente {
+      background-color: #cccccc;
+      color: #333;
+    }
     button {
       padding: 10px;
       border: none;
       border-radius: 5px;
       cursor: pointer;
+      margin-left: 5px;
     }
     .btn-verde {
       background-color: #28a745;
@@ -55,20 +54,18 @@
     }
     .info {
       font-size: 12px;
+      text-align: right;
+      margin-right: 10px;
     }
   </style>
 </head>
 <body>
   <h1>Controle da Condução Escolar</h1>
 
-  <div class="form-container">
-    <input type="text" id="nome-aluno" placeholder="Nome do aluno" />
-    <button class="btn-secundario" onclick="adicionarAluno()">Adicionar</button>
-  </div>
-
   <div style="text-align: center; margin-bottom: 20px;">
     <button class="btn-secundario" onclick="marcarTodos(true)">Marcar Todos</button>
     <button class="btn-secundario" onclick="marcarTodos(false)">Desmarcar Todos</button>
+    <button class="btn-secundario" onclick="limparPresencas()">Limpar Presenças do Dia</button>
   </div>
 
   <div id="lista-alunos"></div>
@@ -81,52 +78,54 @@
     }
 
     function carregarEstado() {
-      const dados = localStorage.getItem("alunosConducao");
-      if (dados) {
-        alunos = JSON.parse(dados);
-      } else {
-        alunos = [
-          { nome: "Luna", presente: false, entrada: null, saida: null },
-          { nome: "Artur", presente: false, entrada: null, saida: null },
-          { nome: "Nátaly", presente: false, entrada: null, saida: null },
-          { nome: "Guilherme", presente: false, entrada: null, saida: null },
-          { nome: "Larissa", presente: false, entrada: null, saida: null },
-          { nome: "Gabriel", presente: false, entrada: null, saida: null },
-          { nome: "Iana", presente: false, entrada: null, saida: null },
-          { nome: "Sophia", presente: false, entrada: null, saida: null },
-          { nome: "Sophia Almeida", presente: false, entrada: null, saida: null },
-          { nome: "Mariana", presente: false, entrada: null, saida: null },
-          { nome: "Mariah", presente: false, entrada: null, saida: null },
-          { nome: "Helton", presente: false, entrada: null, saida: null },
-          { nome: "Beatriz", presente: false, entrada: null, saida: null },
-          { nome: "Giovanna", presente: false, entrada: null, saida: null },
-          { nome: "Brunno", presente: false, entrada: null, saida: null },
-          { nome: "Bianca", presente: false, entrada: null, saida: null },
-          { nome: "Manuela", presente: false, entrada: null, saida: null },
-          { nome: "Clara Costa", presente: false, entrada: null, saida: null },
-          { nome: "Luíza", presente: false, entrada: null, saida: null },
-          { nome: "Laura", presente: false, entrada: null, saida: null }
-        ];
-      }
-    }
+  const dados = localStorage.getItem("alunosConducao");
+  if (dados) {
+    alunos = JSON.parse(dados);
+  } else {
+    alunos = [
+      { nome: "Luna", presente: false, entrada: null, saida: null, naoPresente: false },
+      { nome: "Artur", presente: false, entrada: null, saida: null, naoPresente: false },
+      { nome: "Nátaly", presente: false, entrada: null, saida: null, naoPresente: false },
+      { nome: "Guilherme", presente: false, entrada: null, saida: null, naoPresente: false },
+      { nome: "Larissa", presente: false, entrada: null, saida: null, naoPresente: false },
+      { nome: "Gabriel", presente: false, entrada: null, saida: null, naoPresente: false },
+      { nome: "Iana", presente: false, entrada: null, saida: null, naoPresente: false },
+      { nome: "Sophia", presente: false, entrada: null, saida: null, naoPresente: false },
+      { nome: "Sophia Almeida", presente: false, entrada: null, saida: null, naoPresente: false },
+      { nome: "Mariana", presente: false, entrada: null, saida: null, naoPresente: false },
+      { nome: "Mariah", presente: false, entrada: null, saida: null, naoPresente: false },
+      { nome: "Helton", presente: false, entrada: null, saida: null, naoPresente: false },
+      { nome: "Beatriz", presente: false, entrada: null, saida: null, naoPresente: false },
+      { nome: "Giovanna", presente: false, entrada: null, saida: null, naoPresente: false },
+      { nome: "Brunno", presente: false, entrada: null, saida: null, naoPresente: false },
+      { nome: "Bianca", presente: false, entrada: null, saida: null, naoPresente: false },
+      { nome: "Manuela", presente: false, entrada: null, saida: null, naoPresente: false },
+      { nome: "Clara Costa", presente: false, entrada: null, saida: null, naoPresente: false },
+      { nome: "Luíza", presente: false, entrada: null, saida: null, naoPresente: false },
+      { nome: "Laura", presente: false, entrada: null, saida: null, naoPresente: false }
+    ];
+  }
+}
 
-    function adicionarAluno() {
-      const nomeInput = document.getElementById("nome-aluno");
-      const nome = nomeInput.value.trim();
-      if (nome !== "") {
-        alunos.push({ nome, presente: false, entrada: null, saida: null });
-        nomeInput.value = "";
-        salvarEstado();
-        render();
-      }
-    }
 
     function marcarTodos(presente) {
       const agora = new Date().toLocaleString();
       alunos.forEach((aluno) => {
         aluno.presente = presente;
+        aluno.naoPresente = false;
         aluno.entrada = presente ? agora : null;
         aluno.saida = presente ? null : agora;
+      });
+      salvarEstado();
+      render();
+    }
+
+    function limparPresencas() {
+      alunos.forEach((aluno) => {
+        aluno.presente = false;
+        aluno.naoPresente = false;
+        aluno.entrada = null;
+        aluno.saida = null;
       });
       salvarEstado();
       render();
@@ -138,10 +137,19 @@
 
       alunos.forEach((aluno, index) => {
         const div = document.createElement("div");
-        div.className = "aluno " + (aluno.presente ? "presente" : "ausente");
+
+        if (aluno.naoPresente) {
+          div.className = "aluno nao-presente";
+        } else {
+          div.className = "aluno " + (aluno.presente ? "presente" : "ausente");
+        }
 
         const nome = document.createElement("span");
-        nome.innerText = aluno.nome;
+        nome.innerHTML = aluno.naoPresente
+          ? `⚪ ${aluno.nome}`
+          : aluno.presente
+          ? `✅ ${aluno.nome}`
+          : `❌ ${aluno.nome}`;
 
         const info = document.createElement("div");
         info.className = "info";
@@ -150,26 +158,41 @@
           Saída: ${aluno.saida || "--"}
         `;
 
-        const botao = document.createElement("button");
-        botao.className = aluno.presente ? "btn-vermelho" : "btn-verde";
-        botao.innerText = aluno.presente ? "Sair" : "Entrar";
+        const botaoPresenca = document.createElement("button");
+        botaoPresenca.className = aluno.presente ? "btn-vermelho" : "btn-verde";
+        botaoPresenca.innerText = aluno.presente ? "Sair" : "Entrar";
 
-        botao.onclick = () => {
+        botaoPresenca.onclick = () => {
           aluno.presente = !aluno.presente;
+          aluno.naoPresente = false;
           const agora = new Date().toLocaleString();
           if (aluno.presente) {
             aluno.entrada = agora;
             aluno.saida = null;
           } else {
             aluno.saida = agora;
+            aluno.entrada = null;
           }
+          salvarEstado();
+          render();
+        };
+
+        const botaoNaoPresente = document.createElement("button");
+        botaoNaoPresente.className = "btn-secundario";
+        botaoNaoPresente.innerText = "Não Presente";
+        botaoNaoPresente.onclick = () => {
+          aluno.presente = false;
+          aluno.naoPresente = true;
+          aluno.entrada = null;
+          aluno.saida = null;
           salvarEstado();
           render();
         };
 
         div.appendChild(nome);
         div.appendChild(info);
-        div.appendChild(botao);
+        div.appendChild(botaoPresenca);
+        div.appendChild(botaoNaoPresente);
 
         container.appendChild(div);
       });
@@ -177,6 +200,4 @@
 
     carregarEstado();
     render();
-  </script>
-</body>
-</html>
+  </s
