@@ -78,35 +78,34 @@
     }
 
     function carregarEstado() {
-  const dados = localStorage.getItem("alunosConducao");
-  if (dados) {
-    alunos = JSON.parse(dados);
-  } else {
-    alunos = [
-      { nome: "Luna", presente: false, entrada: null, saida: null, naoPresente: false },
-      { nome: "Artur", presente: false, entrada: null, saida: null, naoPresente: false },
-      { nome: "Nátaly", presente: false, entrada: null, saida: null, naoPresente: false },
-      { nome: "Guilherme", presente: false, entrada: null, saida: null, naoPresente: false },
-      { nome: "Larissa", presente: false, entrada: null, saida: null, naoPresente: false },
-      { nome: "Gabriel", presente: false, entrada: null, saida: null, naoPresente: false },
-      { nome: "Iana", presente: false, entrada: null, saida: null, naoPresente: false },
-      { nome: "Sophia", presente: false, entrada: null, saida: null, naoPresente: false },
-      { nome: "Sophia Almeida", presente: false, entrada: null, saida: null, naoPresente: false },
-      { nome: "Mariana", presente: false, entrada: null, saida: null, naoPresente: false },
-      { nome: "Mariah", presente: false, entrada: null, saida: null, naoPresente: false },
-      { nome: "Helton", presente: false, entrada: null, saida: null, naoPresente: false },
-      { nome: "Beatriz", presente: false, entrada: null, saida: null, naoPresente: false },
-      { nome: "Giovanna", presente: false, entrada: null, saida: null, naoPresente: false },
-      { nome: "Brunno", presente: false, entrada: null, saida: null, naoPresente: false },
-      { nome: "Bianca", presente: false, entrada: null, saida: null, naoPresente: false },
-      { nome: "Manuela", presente: false, entrada: null, saida: null, naoPresente: false },
-      { nome: "Clara Costa", presente: false, entrada: null, saida: null, naoPresente: false },
-      { nome: "Luíza", presente: false, entrada: null, saida: null, naoPresente: false },
-      { nome: "Laura", presente: false, entrada: null, saida: null, naoPresente: false }
-    ];
-  }
-}
-
+      const dados = localStorage.getItem("alunosConducao");
+      if (dados) {
+        alunos = JSON.parse(dados);
+      } else {
+        alunos = [
+          { nome: "Luna", presente: false, entrada: null, saida: null, naoPresente: false },
+          { nome: "Artur", presente: false, entrada: null, saida: null, naoPresente: false },
+          { nome: "Nátaly", presente: false, entrada: null, saida: null, naoPresente: false },
+          { nome: "Guilherme", presente: false, entrada: null, saida: null, naoPresente: false },
+          { nome: "Larissa", presente: false, entrada: null, saida: null, naoPresente: false },
+          { nome: "Gabriel", presente: false, entrada: null, saida: null, naoPresente: false },
+          { nome: "Iana", presente: false, entrada: null, saida: null, naoPresente: false },
+          { nome: "Sophia", presente: false, entrada: null, saida: null, naoPresente: false },
+          { nome: "Sophia Almeida", presente: false, entrada: null, saida: null, naoPresente: false },
+          { nome: "Mariana", presente: false, entrada: null, saida: null, naoPresente: false },
+          { nome: "Mariah", presente: false, entrada: null, saida: null, naoPresente: false },
+          { nome: "Helton", presente: false, entrada: null, saida: null, naoPresente: false },
+          { nome: "Beatriz", presente: false, entrada: null, saida: null, naoPresente: false },
+          { nome: "Giovanna", presente: false, entrada: null, saida: null, naoPresente: false },
+          { nome: "Brunno", presente: false, entrada: null, saida: null, naoPresente: false },
+          { nome: "Bianca", presente: false, entrada: null, saida: null, naoPresente: false },
+          { nome: "Manuela", presente: false, entrada: null, saida: null, naoPresente: false },
+          { nome: "Clara Costa", presente: false, entrada: null, saida: null, naoPresente: false },
+          { nome: "Luíza", presente: false, entrada: null, saida: null, naoPresente: false },
+          { nome: "Laura", presente: false, entrada: null, saida: null, naoPresente: false }
+        ];
+      }
+    }
 
     function marcarTodos(presente) {
       const agora = new Date().toLocaleString();
@@ -135,7 +134,7 @@
       const container = document.getElementById("lista-alunos");
       container.innerHTML = "";
 
-      alunos.forEach((aluno, index) => {
+      alunos.forEach((aluno) => {
         const div = document.createElement("div");
 
         if (aluno.naoPresente) {
@@ -200,4 +199,6 @@
 
     carregarEstado();
     render();
-  </s
+  </script>
+</body>
+</html>
