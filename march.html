@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Controle do Nissan March 2014</title>
+  <title>Controle do Nissan March de Guilherme</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <!-- Bootstrap 5 CDN -->
@@ -73,7 +73,11 @@
   <script>
     const form = document.getElementById('formManutencao');
     const tabela = document.getElementById('registrosBody');
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx9IxnnS-OoVOvGh0N-7mgF26RoHVmp6cxmdUsNHbqsfn-dAhntQRn1D-dGc-8IW4KVYQ/exec"; // substitua pela sua URL
+
+    // Dados fixos do Baserow
+    const token = "zaa0Pfbm4SCbaivRvMmlSEWGKdtldXNd";
+    const tableId = "624801";
+    const url = `https://api.baserow.io/api/database/rows/table/${tableId}/`;
 
     form.addEventListener('submit', function(e) {
       e.preventDefault();
@@ -81,18 +85,27 @@
       const data = document.getElementById('data').value;
       const tipo = document.getElementById('tipo').value;
       const descricao = document.getElementById('descricao').value;
-      const valor = document.getElementById('valor').value;
+      const valor = parseFloat(document.getElementById('valor').value).toFixed(2);
 
       const payload = {
-        data, tipo, descricao, valor
+        "Data": data,
+        "Tipo": tipo,
+        "Descrição": descricao,
+        "Valor": valor
       };
 
-      fetch(WEB_APP_URL, {
+      fetch(url, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Token ${token}`
+        },
         body: JSON.stringify(payload)
       })
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error("Erro na requisição: " + res.status);
+        return res.json();
+      })
       .then(data => {
         alert("Registro salvo com sucesso!");
         adicionarLinha(payload);
@@ -100,17 +113,17 @@
       })
       .catch(err => {
         console.error(err);
-        alert("Erro ao salvar os dados. Verifique a conexão ou o script do Google Sheets.");
+        alert("Erro ao salvar os dados no Baserow.");
       });
     });
 
     function adicionarLinha(dados) {
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td>${dados.data}</td>
-        <td>${dados.tipo}</td>
-        <td>${dados.descricao}</td>
-        <td>${Number(dados.valor).toFixed(2).replace('.', ',')}</td>
+        <td>${dados.Data}</td>
+        <td>${dados.Tipo}</td>
+        <td>${dados.Descrição}</td>
+        <td>${Number(dados.Valor).toFixed(2).replace('.', ',')}</td>
       `;
       tabela.appendChild(tr);
     }
