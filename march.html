@@ -7,11 +7,11 @@
   <!-- Bootstrap 5 -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
-    html, body {
-      height: 100%;
-      margin: 0;
-      padding: 0;
-    }
+  html, body {
+  height: 100vh;
+  width: 100vw;
+  overflow-x: hidden;
+}
     body {
       background-color: #f8f9fa;
       display: flex;
@@ -136,36 +136,37 @@
     });
 
     function carregarHistorico() {
-      fetch(`https://api.baserow.io/api/database/rows/table/${tableID}/?user_field_names=true&order_by=-Data`, {
-        method: "GET",
-        headers: {
-          "Authorization": `Token ${token}`
-        }
-      })
-      .then(response => response.json())
-      .then(data => {
-        const section = document.getElementById("historicoSection");
-        const tbody = section.querySelector("tbody");
-        tbody.innerHTML = "";
-        data.results.forEach(item => {
-          const row = `
-            <tr>
-              <td>${item["Data"] || '-'}</td>
-              <td>${item["Quilometragem"] || '-'}</td>
-              <td>${item["Tipo"] || '-'}</td>
-              <td>${item["Descrição"] || '-'}</td>
-              <td>${item["Valor (R$)"]?.toFixed(2) || '-'}</td>
-            </tr>
-          `;
-          tbody.innerHTML += row;
-        });
-        section.style.display = "block";
-      })
-      .catch(error => {
-        console.error(error);
-        alert("Erro ao carregar o histórico.");
-      });
+  fetch(`https://api.baserow.io/api/database/rows/table/${tableID}/?user_field_names=true&order_by=-5086282`, {
+    method: "GET",
+    headers: {
+      "Authorization": `Token ${token}`
     }
+  })
+  .then(response => response.json())
+  .then(data => {
+    const section = document.getElementById("historicoSection");
+    const tbody = section.querySelector("tbody");
+    tbody.innerHTML = "";
+    data.results.forEach(item => {
+      const valor = parseFloat(item["Valor (R$)"]);
+      const row = `
+        <tr>
+          <td>${item["Data"] || '-'}</td>
+          <td>${item["Quilometragem"] || '-'}</td>
+          <td>${item["Tipo"] || '-'}</td>
+          <td>${item["Descrição"] || '-'}</td>
+          <td>${isNaN(valor) ? '-' : valor.toFixed(2)}</td>
+        </tr>
+      `;
+      tbody.innerHTML += row;
+    });
+    section.style.display = "block";
+  })
+  .catch(error => {
+    console.error(error);
+    alert("Erro ao carregar o histórico.");
+  });
+}
   </script>
 </body>
 </html>
