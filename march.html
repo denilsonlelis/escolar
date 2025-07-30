@@ -35,18 +35,29 @@
     table {
       font-size: 0.95rem;
     }
-    @media (max-width: 576px) {
-      table {
-        font-size: 0.85rem;
-      }
-    }
+    @media (max-width: 768px) {
+  .form-section .col-md-4 {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+
+  .d-flex.align-items-end {
+    flex-direction: column;
+  }
+
+  .d-flex.align-items-end .btn {
+    margin-bottom: 10px;
+    width: 100%;
+  }
+}
+
   </style>
 </head>
 <body>
   <div class="container-fluid">
     <div class="form-section">
-      <h2>Controle de Gastos - Nissan March</h2>
-      <form id="gastosForm">
+      <h2>Controle de Gastos</h2>
+      <form id="gastosForm" class="w-100">
         <div class="row g-3">
           <div class="col-md-4">
             <label for="data" class="form-label">Data</label>
