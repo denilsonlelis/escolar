@@ -6,8 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <!-- Bootstrap 5 -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- DataTables Bootstrap 5 -->
-  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
   <style>
     html, body {
       height: 100%;
@@ -38,18 +36,21 @@
       font-size: 0.95rem;
     }
     @media (max-width: 768px) {
-      .form-section .col-md-4 {
-        flex: 0 0 100%;
-        max-width: 100%;
-      }
-      .d-flex.align-items-end {
-        flex-direction: column;
-      }
-      .d-flex.align-items-end .btn {
-        margin-bottom: 10px;
-        width: 100%;
-      }
-    }
+  .form-section .col-md-4 {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+
+  .d-flex.align-items-end {
+    flex-direction: column;
+  }
+
+  .d-flex.align-items-end .btn {
+    margin-bottom: 10px;
+    width: 100%;
+  }
+}
+
   </style>
 </head>
 <body>
@@ -87,7 +88,7 @@
     </div>
 
     <div id="historicoSection" class="table-responsive" style="display: none;">
-      <table class="table table-bordered table-striped mt-3 w-100" id="historico">
+      <table class="table table-bordered table-striped mt-3" id="historico">
         <thead class="table-dark">
           <tr>
             <th>Data</th>
@@ -102,12 +103,6 @@
     </div>
   </div>
 
-  <!-- Scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-  <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
   <script>
     const tableID = 624801;
     const token = "zaa0Pfbm4SCbaivRvMmlSEWGKdtldXNd";
@@ -121,11 +116,11 @@
       const descricao = document.getElementById("descricao").value;
       const valor = parseFloat(document.getElementById("valor").value);
 
-      fetch(`https://api.baserow.io/api/database/rows/table/${tableID}/?user_field_names=true`, {
+      fetch(https://api.baserow.io/api/database/rows/table/${tableID}/?user_field_names=true, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Token ${token}`
+          "Authorization": Token ${token}
         },
         body: JSON.stringify({
           "Data": data,
@@ -150,16 +145,11 @@
       });
     });
 
-    function formatarDataBR(dataISO) {
-      const [ano, mes, dia] = dataISO.split("-");
-      return `${dia}-${mes}-${ano}`;
-    }
-
     function carregarHistorico() {
-      fetch(`https://api.baserow.io/api/database/rows/table/${tableID}/?user_field_names=true`, {
+      fetch(https://api.baserow.io/api/database/rows/table/${tableID}/?user_field_names=true, {
         method: "GET",
         headers: {
-          "Authorization": `Token ${token}`
+          "Authorization": Token ${token}
         }
       })
       .then(response => {
@@ -171,46 +161,24 @@
         const tbody = document.querySelector("#historico tbody");
         tbody.innerHTML = "";
 
+        // Ordenar por data decrescente
         const registrosOrdenados = data.results.sort((a, b) => new Date(b["Data"]) - new Date(a["Data"]));
 
         registrosOrdenados.forEach(item => {
           const valor = parseFloat(item["Valor (R$)"]);
-          const dataFormatada = item["Data"] ? formatarDataBR(item["Data"]) : "-";
-
-          const row = `
+          const row = 
             <tr>
-              <td>${dataFormatada}</td>
+              <td>${item["Data"] || '-'}</td>
               <td>${item["quilometragem"] || '-'}</td>
               <td>${item["Tipo"] || '-'}</td>
               <td>${item["Descrição"] || '-'}</td>
               <td>${isNaN(valor) ? '-' : valor.toFixed(2)}</td>
             </tr>
-          `;
+          ;
           tbody.innerHTML += row;
         });
 
-        // Inicializa o DataTable
         section.style.display = "block";
-        if (!$.fn.DataTable.isDataTable('#historico')) {
-          $('#historico').DataTable({
-            language: {
-              url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json'
-            },
-            pageLength: 10,
-            lengthChange: true,
-            order: [[0, "desc"]]
-          });
-        } else {
-          $('#historico').DataTable().clear().destroy();
-          $('#historico').DataTable({
-            language: {
-              url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json'
-            },
-            pageLength: 10,
-            lengthChange: true,
-            order: [[0, "desc"]]
-          });
-        }
       })
       .catch(error => {
         console.error(error);
