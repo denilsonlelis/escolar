@@ -45,7 +45,7 @@
 <body>
   <div class="container-fluid">
     <div class="form-section">
-      <h2>Controle de Gastos - Nissan March</h2>
+      <h2>Controle de Gastos - Nissan March 2014</h2>
       <form id="gastosForm">
         <div class="row g-3">
           <div class="col-md-4">
@@ -54,7 +54,7 @@
           </div>
           <div class="col-md-4">
             <label for="km" class="form-label">Quilometragem</label>
-            <input type="number" class="form-control" id="km" placeholder="Ex: 123456" required>
+            <input type="text" class="form-control" id="km" placeholder="Ex: 123456" required>
           </div>
           <div class="col-md-4">
             <label for="tipo" class="form-label">Tipo</label>
@@ -100,7 +100,7 @@
       e.preventDefault();
 
       const data = document.getElementById("data").value;
-      const km = parseInt(document.getElementById("km").value);
+      const km = document.getElementById("km").value;
       const tipo = document.getElementById("tipo").value;
       const descricao = document.getElementById("descricao").value;
       const valor = parseFloat(document.getElementById("valor").value);
