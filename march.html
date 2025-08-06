@@ -35,22 +35,23 @@
     table {
       font-size: 0.95rem;
     }
+    tfoot {
+      font-weight: bold;
+      background-color: #f1f1f1;
+    }
     @media (max-width: 768px) {
-  .form-section .col-md-4 {
-    flex: 0 0 100%;
-    max-width: 100%;
-  }
-
-  .d-flex.align-items-end {
-    flex-direction: column;
-  }
-
-  .d-flex.align-items-end .btn {
-    margin-bottom: 10px;
-    width: 100%;
-  }
-}
-
+      .form-section .col-md-4 {
+        flex: 0 0 100%;
+        max-width: 100%;
+      }
+      .d-flex.align-items-end {
+        flex-direction: column;
+      }
+      .d-flex.align-items-end .btn {
+        margin-bottom: 10px;
+        width: 100%;
+      }
+    }
   </style>
 </head>
 <body>
@@ -80,14 +81,13 @@
             <input type="number" class="form-control" id="valor" step="0.01" required>
           </div>
           <div class="col-md-4 d-flex align-items-end">
-            <button type="submit" class="btn btn-success w-100 me-2">Salvar</button>
-            <button type="button" class="btn btn-primary w-100" onclick="carregarHistorico()">Ver Histórico</button>
+            <button type="submit" class="btn btn-success w-100">Salvar</button>
           </div>
         </div>
       </form>
     </div>
 
-    <div id="historicoSection" class="table-responsive" style="display: none;">
+    <div id="historicoSection" class="table-responsive">
       <table class="table table-bordered table-striped mt-3" id="historico">
         <thead class="table-dark">
           <tr>
@@ -99,6 +99,12 @@
           </tr>
         </thead>
         <tbody></tbody>
+        <tfoot>
+          <tr>
+            <td colspan="4" class="text-end">Total:</td>
+            <td id="totalGastos">0,00</td>
+          </tr>
+        </tfoot>
       </table>
     </div>
   </div>
@@ -134,7 +140,7 @@
         if (!response.ok) throw new Error("Erro ao salvar");
         return response.json();
       })
-      .then(data => {
+      .then(() => {
         alert("Dados salvos com sucesso!");
         document.getElementById("gastosForm").reset();
         carregarHistorico();
@@ -157,15 +163,16 @@
         return response.json();
       })
       .then(data => {
-        const section = document.getElementById("historicoSection");
         const tbody = document.querySelector("#historico tbody");
         tbody.innerHTML = "";
+        let soma = 0;
 
-        // Ordenar por data decrescente
         const registrosOrdenados = data.results.sort((a, b) => new Date(b["Data"]) - new Date(a["Data"]));
 
         registrosOrdenados.forEach(item => {
           const valor = parseFloat(item["Valor (R$)"]);
+          if (!isNaN(valor)) soma += valor;
+
           const row = `
             <tr>
               <td>${item["Data"] || '-'}</td>
@@ -178,13 +185,16 @@
           tbody.innerHTML += row;
         });
 
-        section.style.display = "block";
+        document.getElementById("totalGastos").innerText = soma.toFixed(2);
       })
       .catch(error => {
         console.error(error);
         alert("Erro ao carregar o histórico.");
       });
     }
+
+    // Carrega a tabela automaticamente ao abrir a página
+    window.onload = carregarHistorico;
   </script>
 </body>
 </html>
