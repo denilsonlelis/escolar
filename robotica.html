@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Controle de Presença - Clube de Robótica</title>
+<style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    th { background-color: #f2f2f2; }
+    button { margin: 5px; padding: 8px 12px; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<h2>Controle de Presença - Clube de Robótica</h2>
+
+<button onclick="marcarTodos(true)">✅ Habilitar Todos</button>
+<button onclick="marcarTodos(false)">❌ Desabilitar Todos</button>
+
+<table id="tabelaPresenca">
+    <thead>
+        <tr>
+            <th>Número</th>
+            <th>Nome</th>
+            <th>Data da Aula</th>
+            <th>Presente</th>
+            <th>% Presença</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Exemplo de dados - depois você pode carregar via API -->
+        <tr>
+            <td>1</td>
+            <td>Maria Silva</td>
+            <td><input type="date" value=""></td>
+            <td><input type="checkbox" onchange="atualizarPercentual(this)"></td>
+            <td class="percentual">0%</td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>João Santos</td>
+            <td><input type="date" value=""></td>
+            <td><input type="checkbox" onchange="atualizarPercentual(this)"></td>
+            <td class="percentual">0%</td>
+        </tr>
+    </tbody>
+</table>
+
+<br>
+<button onclick="salvarNoBaserow()">💾 Salvar no Baserow</button>
+
+<script>
+const API_TOKEN = "SUA_CHAVE_API";
+const TABLE_ID = "SUA_TABELA_ID"; // fornecido pelo Baserow
+
+// Total de aulas para cálculo do percentual
+const totalAulas = 10;
+
+function marcarTodos(status) {
+    document.querySelectorAll('#tabelaPresenca tbody input[type="checkbox"]').forEach(cb => {
+        cb.checked = status;
+        atualizarPercentual(cb);
+    });
+}
+
+function atualizarPercentual(checkbox) {
+    let row = checkbox.closest('tr');
+    let percentualCell = row.querySelector('.percentual');
+    let aulasPresentes = checkbox.checked ? 1 : 0;
+    let percentual = (aulasPresentes / totalAulas) * 100;
+    percentualCell.textContent = percentual.toFixed(1) + '%';
+}
+
+async function salvarNoBaserow() {
+    let linhas = document.querySelectorAll('#tabelaPresenca tbody tr');
+
+    for (let row of linhas) {
+        let numero = row.cells[0].textContent;
+        let nome = row.cells[1].textContent;
+        let dataAula = row.querySelector('input[type="date"]').value;
+        let presente = row.querySelector('input[type="checkbox"]').checked;
+        let percentual = parseFloat(row.querySelector('.percentual').textContent);
+
+        let dados = {
+            "fields": {
+                "numero_aluno": parseInt(numero),
+                "nome_aluno": nome,
+                "data_aula": dataAula,
+                "presente": presente,
+                "total_aulas": totalAulas,
+                "aulas_presentes": presente ? 1 : 0,
+                "percentual": percentual
+            }
+        };
+
+        await fetch(`https://api.baserow.io/api/database/rows/table/${TABLE_ID}/`, {
+            method: "POST",
+            headers: {
+                "Authorization": `Token ${API_TOKEN}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(dados)
+        });
+    }
+
+    alert("Presenças salvas no Baserow!");
+}
+</script>
+
+</body>
+</html>
