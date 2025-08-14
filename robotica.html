@@ -1,151 +1,122 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Controle de Presença - Clube de Robótica</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<style>
-    body { background-color: #f8f9fa; }
-    table { background: white; }
-    th, td { text-align: center; vertical-align: middle; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Presença</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; }
+        .container { max-width: 800px; margin-top: 20px; }
+        table { background-color: white; }
+    </style>
 </head>
-<body class="container py-4">
+<body>
 
-<h2 class="mb-4 text-center">Controle Presença - Clube de Robótica</h2>
+<div class="container">
+    <h2 class="text-center mb-4">Registro de Presença - ROBÓTICA</h2>
 
-<div class="mb-3">
-    <label for="data_geral" class="form-label">Data da Aula</label>
-    <input type="date" id="data_geral" class="form-control" onchange="atualizarDataTodas()">
-</div>
+    <div class="mb-3">
+        <label for="data_aula" class="form-label">Data da Aula</label>
+        <input type="date" id="data_aula" class="form-control">
+    </div>
 
-<div class="mb-3">
-    <button class="btn btn-success me-2" onclick="habilitarTodos()">Habilitar Todos</button>
-    <button class="btn btn-danger" onclick="desabilitarTodos()">Desabilitar Todos</button>
-</div>
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>Nº</th>
+                <th>Nome do Aluno</th>
+                <th>Presente</th>
+                <th>Total Aulas</th>
+                <th>Aulas Presentes</th>
+                <th>%</th>
+            </tr>
+        </thead>
+        <tbody id="lista-alunos">
+            <!-- Lista de 50 alunos fictícios -->
+            <script>
+                const nomes = [
+                    "Ana Souza","Bruno Lima","Carlos Mendes","Daniela Rocha","Eduardo Alves",
+                    "Fernanda Torres","Gabriel Martins","Helena Costa","Igor Ribeiro","Joana Freitas",
+                    "Kleber Santos","Larissa Gomes","Marcos Vieira","Natália Duarte","Otávio Farias",
+                    "Patrícia Ramos","Quésia Monteiro","Ricardo Pires","Sabrina Lopes","Tiago Nunes",
+                    "Ursula Andrade","Vinícius Matos","Wesley Barros","Xavier Silva","Yasmin Prado",
+                    "Zilda Rezende","Arthur Cunha","Beatriz Correia","Caio Neves","Débora Batista",
+                    "Enzo Carvalho","Flávia Cardoso","Gustavo Moreira","Heloísa Meireles","Isabela Soares",
+                    "Júlio Fernandes","Kamila Brandão","Leandro Tavares","Melissa Peixoto","Nicolas Pinto",
+                    "Olívia Rocha","Paulo César","Queila Fonseca","Rafael Almeida","Sara Menezes",
+                    "Túlio Campos","Vera Lúcia","William Costa","Yuri Fonseca","Zuleica Campos"
+                ];
 
-<table class="table table-bordered table-striped table-hover">
-    <thead class="table-dark">
-        <tr>
-            <th>Nº</th>
-            <th>Nome do Aluno</th>
-            <th>Data</th>
-            <th>Presente</th>
-            <th>% Presença</th>
-        </tr>
-    </thead>
-    <tbody id="tabelaAlunos">
-        <!-- Alunos serão inseridos via JavaScript -->
-    </tbody>
-</table>
+                document.addEventListener("DOMContentLoaded", () => {
+                    const tbody = document.getElementById("lista-alunos");
+                    nomes.forEach((nome, index) => {
+                        tbody.innerHTML += `
+                            <tr>
+                                <td>${index + 1}</td>
+                                <td>${nome}</td>
+                                <td><input type="checkbox" class="form-check-input presente"></td>
+                                <td><input type="number" class="form-control total_aulas" value="10"></td>
+                                <td><input type="number" class="form-control aulas_presentes" value="0"></td>
+                                <td><input type="number" class="form-control percentual" value="0"></td>
+                            </tr>
+                        `;
+                    });
+                });
+            </script>
+        </tbody>
+    </table>
 
-<div class="mt-3">
-    <button class="btn btn-primary" onclick="salvarPresencas()">Salvar Presenças</button>
+    <button class="btn btn-success w-100" onclick="salvarDados()">Salvar Registros</button>
+    <div id="mensagem" class="mt-3 text-center"></div>
 </div>
 
 <script>
-const API_TOKEN = "zaa0Pfbm4SCbaivRvMmlSEWGKdtldXNd";
-const TABLE_ID = "642370";
+    const API_TOKEN = "zaa0Pfbm4SCbaivRvMmlSEWGKdtldXNd";
+    const TABLE_ID = "642370";
 
-// Lista de 50 nomes fictícios
-const alunos = [
-    "Ana Souza","Bruno Lima","Carlos Mendes","Daniela Rocha","Eduardo Castro",
-    "Fernanda Alves","Gabriel Costa","Helena Duarte","Igor Pereira","Julia Nogueira",
-    "Kleber Ramos","Larissa Cardoso","Marcos Vieira","Natália Campos","Otávio Barbosa",
-    "Patrícia Melo","Quésia Andrade","Rafael Silva","Sabrina Fonseca","Tiago Moreira",
-    "Ursula Martins","Vinícius Teixeira","Wellington Prado","Xavier Almeida","Yasmin Oliveira",
-    "Zeca Farias","Amanda Brito","Breno Araújo","Clara Pires","Diego Lopes",
-    "Elaine Moraes","Fábio Correia","Giovana Santana","Henrique Brito","Isabela Souza",
-    "João Victor","Karen Barbosa","Lucas Martins","Marina Dias","Nicolas Ribeiro",
-    "Olívia Torres","Paulo Henrique","Queila Batista","Rodrigo Almeida","Silvia Freitas",
-    "Tatiane Rocha","Ulisses Gomes","Vera Lúcia","Willian Monteiro","Yuri Fernandes"
-];
+    async function salvarDados() {
+        const dataAula = document.getElementById("data_aula").value;
+        const linhas = document.querySelectorAll("#lista-alunos tr");
+        let registrosSalvos = 0;
 
-// Preenche tabela
-let tabela = document.getElementById("tabelaAlunos");
-alunos.forEach((nome, i) => {
-    let num = i + 1;
-    tabela.innerHTML += `
-        <tr>
-            <td id="numero_${num}">${num}</td>
-            <td id="nome_${num}">${nome}</td>
-            <td><input type="date" id="data_${num}" class="form-control"></td>
-            <td><input type="checkbox" id="presente_${num}" onchange="calcularPercentual(${num})"></td>
-            <td id="percentual_${num}">0%</td>
-        </tr>
-    `;
-});
+        for (let i = 0; i < linhas.length; i++) {
+            const numero = i + 1;
+            const nome = nomes[i];
+            const presente = linhas[i].querySelector(".presente").checked;
+            const totalAulas = linhas[i].querySelector(".total_aulas").value;
+            const aulasPresentes = linhas[i].querySelector(".aulas_presentes").value;
+            const percentual = linhas[i].querySelector(".percentual").value;
 
-// Atualiza data de todos
-function atualizarDataTodas() {
-    const dataGeral = document.getElementById("data_geral").value;
-    alunos.forEach((_, i) => {
-        document.getElementById(`data_${i+1}`).value = dataGeral;
-    });
-}
+            const payload = {
+                fields: {
+                    "5247573": numero,
+                    "5247574": nome,
+                    "5247596": dataAula,
+                    "5247575": presente,
+                    "5247608": parseInt(totalAulas),
+                    "5247609": parseInt(aulasPresentes),
+                    "5247669": parseFloat(percentual)
+                }
+            };
 
-// Habilitar todos
-function habilitarTodos() {
-    alunos.forEach((_, i) => {
-        document.getElementById(`presente_${i+1}`).checked = true;
-        calcularPercentual(i+1);
-    });
-}
+            let res = await fetch(`https://api.baserow.io/api/database/rows/table/${TABLE_ID}/`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Token ${API_TOKEN}`
+                },
+                body: JSON.stringify(payload)
+            });
 
-// Desabilitar todos
-function desabilitarTodos() {
-    alunos.forEach((_, i) => {
-        document.getElementById(`presente_${i+1}`).checked = false;
-        calcularPercentual(i+1);
-    });
-}
+            if (res.ok) {
+                registrosSalvos++;
+            }
+        }
 
-// Calcula percentual
-function calcularPercentual(id) {
-    let totalAulas = 1;
-    let aulasPresentes = document.getElementById(`presente_${id}`).checked ? 1 : 0;
-    let percentual = ((aulasPresentes / totalAulas) * 100).toFixed(0) + "%";
-    document.getElementById(`percentual_${id}`).innerText = percentual;
-}
-
-// Salva no Baserow
-function salvarPresencas() {
-    alunos.forEach((_, i) => {
-        let id = i + 1;
-        let numero = document.getElementById(`numero_${id}`).textContent;
-        let nome = document.getElementById(`nome_${id}`).textContent;
-        let dataAula = document.getElementById(`data_${id}`).value;
-        let presente = document.getElementById(`presente_${id}`).checked ? "Sim" : "Não";
-        let totalAulas = 1;
-        let aulasPresentes = presente === "Sim" ? 1 : 0;
-        let percentual = document.getElementById(`percentual_${id}`).innerText;
-
-        if (!dataAula) return; // ignora linhas sem data
-
-        fetch(`https://api.baserow.io/api/database/rows/table/${TABLE_ID}/`, {
-            method: "POST",
-            headers: {
-                "Authorization": `Token ${API_TOKEN}`,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                5247573: numero,
-                5247574: nome,
-                5247596: dataAula,
-                5247575: presente,
-                5247608: totalAulas,
-                5247609: aulasPresentes,
-                5247669: percentual
-            })
-        })
-        .then(res => res.json())
-        .then(data => console.log("Salvo:", data))
-        .catch(err => console.error("Erro:", err));
-    });
-
-    alert("Presenças salvas no Baserow!");
-}
+        document.getElementById("mensagem").innerHTML =
+            `<div class="alert alert-success">✅ ${registrosSalvos} registros salvos com sucesso!</div>`;
+    }
 </script>
 
 </body>
