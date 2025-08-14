@@ -13,7 +13,7 @@
 </head>
 <body class="container py-4">
 
-<h2 class="mb-4 text-center">Controle de Presença - Clube de Robótica</h2>
+<h2 class="mb-4 text-center">Controle Presença - Clube de Robótica</h2>
 
 <div class="mb-3">
     <label for="data_geral" class="form-label">Data da Aula</label>
@@ -130,13 +130,13 @@ function salvarPresencas() {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                field_5247573: numero,
-                field_5247574: nome,
-                field_5247596: dataAula,
-                field_5247575: presente,
-                field_5247608: totalAulas,
-                field_5247609: aulasPresentes,
-                field_5247669: percentual
+                5247573: numero,
+                5247574: nome,
+                5247596: dataAula,
+                5247575: presente,
+                5247608: totalAulas,
+                5247609: aulasPresentes,
+                5247669: percentual
             })
         })
         .then(res => res.json())
