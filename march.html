@@ -69,9 +69,15 @@
             <input type="text" class="form-control" id="km" placeholder="Ex: 123456" required>
           </div>
           <div class="col-md-4">
-            <label for="tipo" class="form-label">Qual veículo</label>
-            <input type="text" class="form-control" id="tipo" placeholder="Ex: Troca de óleo" required>
+          <label for="tipo" class="form-label">Qual veículo</label>
+          <select class="form-control" id="tipo" required>
+              <option value="">Selecione...</option>
+              <option value="Van Escolar BRANCA">Van Escolar BRANCA</option>
+              <option value="Van Escolar CINZA">Van Escolar CINZA</option>
+              <option value="Peugeot 208">Peugeot 208</option>
+          </select>
           </div>
+
           <div class="col-md-4">
             <label for="descricao" class="form-label">Descrição</label>
             <input type="text" class="form-control" id="descricao" required>
