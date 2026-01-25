@@ -5,134 +5,108 @@
   <title>Controle de Gastos dos veículos</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!-- Bootstrap 5 -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
   <style>
-    html, body {
-      height: 100%;
-      margin: 0;
-      padding: 0;
-    }
     body {
       background-color: #f8f9fa;
-      display: flex;
-      flex-direction: column;
-    }
-    .container-fluid {
-      flex: 1;
       padding: 20px;
     }
     .form-section {
-      background: #ffffff;
+      background: #fff;
       padding: 20px;
       border-radius: 12px;
       box-shadow: 0 0 15px rgba(0,0,0,0.1);
       margin-bottom: 20px;
     }
-    h2 {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    table {
-      font-size: 0.95rem;
-    }
-    tfoot {
-      font-weight: bold;
-      background-color: #f1f1f1;
-    }
-    @media (max-width: 768px) {
-      .form-section .col-md-4 {
-        flex: 0 0 100%;
-        max-width: 100%;
-      }
-      .d-flex.align-items-end {
-        flex-direction: column;
-      }
-      .d-flex.align-items-end .btn {
-        margin-bottom: 10px;
-        width: 100%;
-      }
-    }
   </style>
 </head>
 
 <body>
+
 <div class="container-fluid">
 
   <div class="form-section">
-    <h2>Controle de Gastos e Manutenção</h2>
+    <h2 class="text-center mb-3">Controle de Gastos e Manutenção</h2>
 
-    <form id="gastosForm" class="w-100">
+    <form id="gastosForm">
       <div class="row g-3">
 
         <div class="col-md-4">
-          <label for="data" class="form-label">Data</label>
-          <input type="date" class="form-control" id="data" required>
+          <label class="form-label">Data</label>
+          <input type="date" id="data" class="form-control" required>
         </div>
 
         <div class="col-md-4">
-          <label for="km" class="form-label">Quilometragem</label>
-          <input type="text" class="form-control" id="km" required>
+          <label class="form-label">Quilometragem</label>
+          <input type="text" id="km" class="form-control" required>
         </div>
 
         <div class="col-md-4">
-          <label for="tipo" class="form-label">Qual veículo</label>
-          <select class="form-control" id="tipo" required>
+          <label class="form-label">Qual veículo</label>
+          <select id="tipo" class="form-control" required>
             <option value="">Selecione...</option>
-            <option value="Van Escolar BRANCA">Van Escolar BRANCA</option>
-            <option value="Van Escolar CINZA">Van Escolar CINZA</option>
-            <option value="MOTORHOME">MOTORHOME</option>
-            <option value="Peugeot 208">Peugeot 208</option>
-            <option value="Honda HRV">Honda HRV</option>
+            <option>Van Escolar BRANCA</option>
+            <option>Van Escolar CINZA</option>
+            <option>MOTORHOME</option>
+            <option>Peugeot 208</option>
+            <option>Honda HRV</option>
           </select>
         </div>
 
         <div class="col-md-4">
-          <label for="descricao" class="form-label">Descrição</label>
-          <input type="text" class="form-control" id="descricao" required>
+          <label class="form-label">Descrição</label>
+          <input type="text" id="descricao" class="form-control" required>
         </div>
 
         <div class="col-md-4">
-          <label for="valor" class="form-label">Valor (R$)</label>
-          <input type="number" class="form-control" id="valor" step="0.01" required>
+          <label class="form-label">Valor (R$)</label>
+          <input type="number" id="valor" class="form-control" step="0.01" required>
         </div>
 
         <div class="col-md-4">
-          <label for="notaFiscal" class="form-label">Link da Nota Fiscal (Google Drive)</label>
-          <input
-            type="url"
-            class="form-control"
-            id="notaFiscal"
-            placeholder="https://drive.google.com/..."
-          >
+          <label class="form-label">Link da Nota Fiscal</label>
+          <input type="url" id="notaFiscal" class="form-control">
         </div>
 
         <div class="col-md-4 d-flex align-items-end">
-          <button type="submit" class="btn btn-success w-100">Salvar</button>
+          <button class="btn btn-success w-100">Salvar</button>
         </div>
 
       </div>
     </form>
   </div>
 
-  <div id="historicoSection" class="table-responsive">
-    <table class="table table-bordered table-striped mt-3" id="historico">
+  <!-- FILTRO -->
+  <div class="mb-3">
+    <label class="form-label">Filtrar por veículo</label>
+    <select id="filtroVeiculo" class="form-control">
+      <option value="">Todos</option>
+      <option>Van Escolar BRANCA</option>
+      <option>Van Escolar CINZA</option>
+      <option>MOTORHOME</option>
+      <option>Peugeot 208</option>
+      <option>Honda HRV</option>
+    </select>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-bordered table-striped">
       <thead class="table-dark">
         <tr>
           <th>Data</th>
           <th>Km</th>
           <th>Veículo</th>
           <th>Descrição</th>
-          <th>Valor (R$)</th>
+          <th>Valor</th>
           <th>Nota Fiscal</th>
         </tr>
       </thead>
-      <tbody></tbody>
+      <tbody id="tabelaBody"></tbody>
       <tfoot>
         <tr>
-          <td colspan="5" class="text-end">Total:</td>
-          <td id="totalGastos">0,00</td>
+          <td colspan="4" class="text-end">Total:</td>
+          <td colspan="2" id="totalGastos">0,00</td>
         </tr>
       </tfoot>
     </table>
@@ -143,16 +117,10 @@
 <script>
   const tableID = 624801;
   const token = "zaa0Pfbm4SCbaivRvMmlSEWGKdtldXNd";
+  let todosRegistros = [];
 
-  document.getElementById("gastosForm").addEventListener("submit", function (e) {
+  document.getElementById("gastosForm").addEventListener("submit", e => {
     e.preventDefault();
-
-    const data = document.getElementById("data").value;
-    const km = document.getElementById("km").value;
-    const tipo = document.getElementById("tipo").value;
-    const descricao = document.getElementById("descricao").value;
-    const valor = parseFloat(document.getElementById("valor").value);
-    const notaFiscal = document.getElementById("notaFiscal").value;
 
     fetch(`https://api.baserow.io/api/database/rows/table/${tableID}/?user_field_names=true`, {
       method: "POST",
@@ -161,69 +129,66 @@
         "Authorization": `Token ${token}`
       },
       body: JSON.stringify({
-        "Data": data,
-        "quilometragem": km,
-        "Tipo": tipo,
-        "Descrição": descricao,
-        "Valor (R$)": valor,
-        "Nota Fiscal (Link)": notaFiscal
+        "Data": data.value,
+        "quilometragem": km.value,
+        "Tipo": tipo.value,
+        "Descrição": descricao.value,
+        "Valor (R$)": parseFloat(valor.value),
+        "Nota Fiscal (Link)": notaFiscal.value
       })
-    })
-    .then(response => {
-      if (!response.ok) throw new Error("Erro ao salvar");
-      return response.json();
-    })
-    .then(() => {
-      document.getElementById("gastosForm").reset();
+    }).then(() => {
+      gastosForm.reset();
       carregarHistorico();
-    })
-    .catch(error => {
-      console.error(error);
-      alert("Erro ao salvar os dados.");
     });
   });
 
   function carregarHistorico() {
     fetch(`https://api.baserow.io/api/database/rows/table/${tableID}/?user_field_names=true`, {
-      headers: {
-        "Authorization": `Token ${token}`
-      }
+      headers: { "Authorization": `Token ${token}` }
     })
-    .then(response => response.json())
+    .then(res => res.json())
     .then(data => {
-      const tbody = document.querySelector("#historico tbody");
-      tbody.innerHTML = "";
-      let soma = 0;
-
-      const registrosOrdenados = data.results.sort(
-        (a, b) => new Date(b["Data"]) - new Date(a["Data"])
+      todosRegistros = data.results.sort(
+        (a, b) => new Date(b.Data) - new Date(a.Data)
       );
-
-      registrosOrdenados.forEach(item => {
-        const valor = parseFloat(item["Valor (R$)"]);
-        if (!isNaN(valor)) soma += valor;
-
-        tbody.innerHTML += `
-          <tr>
-            <td>${item["Data"] || "-"}</td>
-            <td>${item["quilometragem"] || "-"}</td>
-            <td>${item["Tipo"] || "-"}</td>
-            <td>${item["Descrição"] || "-"}</td>
-            <td>${isNaN(valor) ? "-" : valor.toFixed(2)}</td>
-            <td>
-              ${item["Nota Fiscal (Link)"]
-                ? `<a href="${item["Nota Fiscal (Link)"]}" target="_blank">Abrir</a>`
-                : "-"}
-            </td>
-          </tr>
-        `;
-      });
-
-      document.getElementById("totalGastos").innerText = soma.toFixed(2);
+      renderizarTabela(todosRegistros);
     });
   }
 
+  function renderizarTabela(registros) {
+    const tbody = document.getElementById("tabelaBody");
+    tbody.innerHTML = "";
+    let total = 0;
+
+    registros.forEach(r => {
+      const valor = parseFloat(r["Valor (R$)"]);
+      if (!isNaN(valor)) total += valor;
+
+      tbody.innerHTML += `
+        <tr>
+          <td>${r.Data}</td>
+          <td>${r.quilometragem}</td>
+          <td>${r.Tipo}</td>
+          <td>${r.Descrição}</td>
+          <td>${valor.toFixed(2)}</td>
+          <td>${r["Nota Fiscal (Link)"] ? `<a href="${r["Nota Fiscal (Link)"]}" target="_blank">Abrir</a>` : "-"}</td>
+        </tr>
+      `;
+    });
+
+    document.getElementById("totalGastos").innerText = total.toFixed(2);
+  }
+
+  document.getElementById("filtroVeiculo").addEventListener("change", function () {
+    const veiculo = this.value;
+    const filtrados = veiculo
+      ? todosRegistros.filter(r => r.Tipo === veiculo)
+      : todosRegistros;
+    renderizarTabela(filtrados);
+  });
+
   window.onload = carregarHistorico;
 </script>
+
 </body>
 </html>
