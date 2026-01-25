@@ -98,8 +98,9 @@
           <th>Km</th>
           <th>Veículo</th>
           <th>Descrição</th>
-          <th>Valor</th>
           <th>Nota Fiscal</th>
+          <th>Valor</th>
+         
         </tr>
       </thead>
       <tbody id="tabelaBody"></tbody>
@@ -133,8 +134,9 @@
         "quilometragem": km.value,
         "Tipo": tipo.value,
         "Descrição": descricao.value,
-        "Valor (R$)": parseFloat(valor.value),
-        "Nota Fiscal (Link)": notaFiscal.value
+         "Nota Fiscal (Link)": notaFiscal.value,
+        "Valor (R$)": parseFloat(valor.value)
+       
       })
     }).then(() => {
       gastosForm.reset();
@@ -170,8 +172,9 @@
           <td>${r.quilometragem}</td>
           <td>${r.Tipo}</td>
           <td>${r.Descrição}</td>
-          <td>${valor.toFixed(2)}</td>
           <td>${r["Nota Fiscal (Link)"] ? `<a href="${r["Nota Fiscal (Link)"]}" target="_blank">Abrir</a>` : "-"}</td>
+          <td>${valor.toFixed(2)}</td>
+          
         </tr>
       `;
     });
